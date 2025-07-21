@@ -1,7 +1,7 @@
 // Configuration
 const config = {
   imgbbAPIKey: "baacb15885823b0da52db6c791339cdc",
-  googleScriptURL: "YOUR_GOOGLE_SCRIPT_URL_HERE",
+  googleScriptURL: "https://script.google.com/macros/s/AKfycbyv613OR-wOfzyk_WAj7r3i6KzIPJZQUWYnmFtUoDfPyesNnUJt51QjmoXDqOZTuJo/exec",
   secretKey: "your_secret_key_123"
 };
 
