@@ -10,10 +10,10 @@
   <div class="container">
     <img src="logo.png" alt="App Logo" class="logo" />
 
-    <a href="https://google.com" target="_blank">
-      <button id="downloadBtn">Download App</button>
-    </a>
+    <!-- Download App Button -->
+    <button id="downloadBtn">Download App</button>
 
+    <!-- Hidden Form -->
     <div id="formSection" style="display: none;">
       <form id="rewardForm">
         <input type="text" name="name" placeholder="Enter your name" required />
@@ -25,6 +25,7 @@
       <p class="note">Your reward will be credited within 24 hours after verification.</p>
     </div>
 
+    <!-- Instructions -->
     <div class="instructions">
       <h2>📌 Instructions:</h2>
       <ul>
@@ -37,6 +38,20 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Script -->
+  <script>
+    const downloadBtn = document.getElementById("downloadBtn");
+    const formSection = document.getElementById("formSection");
+
+    downloadBtn.addEventListener("click", () => {
+      // Open app download link
+      window.open("https://google.com", "_blank");
+
+      // Reveal form after 300ms
+      setTimeout(() => {
+        formSection.style.display = "block";
+      }, 300);
+    });
+  </script>
 </body>
 </html>
