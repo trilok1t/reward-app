@@ -1,12 +1,23 @@
 // Configuration
 const config = {
-  googleScriptURL: "https://script.google.com/macros/s/AKfycbz7zLJgNens8knNO1k5uP3xGhKHzkl00QdXyp7ywO3xD5DPjv2vnGkh92XDpbeME_U5pA/exec", // Replace with your deployed URL (ends with /exec)
-  imgbbAPIKey: "baacb15885823b0da52db6c791339cdc" // Optional - only if using image uploads
+  googleScriptURL: "https://script.google.com/macros/s/AKfycbz7zLJgNens8knNO1k5uP3xGhKHzkl00QdXyp7ywO3xD5DPjv2vnGkh92XDpbeME_U5pA/exec",
+  imgbbAPIKey: "baacb15885823b0da52db6c791339cdc"
 };
 
 // DOM Elements
+const downloadBtn = document.getElementById("downloadBtn");
+const initialSection = document.getElementById("initialSection");
+const formSection = document.getElementById("formSection");
 const rewardForm = document.getElementById("rewardForm");
 const statusMessage = document.getElementById("statusMessage");
+
+// Toggle between download and form sections
+downloadBtn.addEventListener("click", function(e) {
+  e.preventDefault();
+  initialSection.style.display = "none";
+  formSection.style.display = "block";
+  formSection.scrollIntoView({ behavior: "smooth" });
+});
 
 // Form Submission Handler
 rewardForm.addEventListener("submit", async (e) => {
@@ -42,7 +53,7 @@ rewardForm.addEventListener("submit", async (e) => {
   submitBtn.textContent = "Processing...";
 
   try {
-    // 1. Upload image if exists (optional)
+    // 1. Upload image if exists
     let imageUrl = "";
     if (formData.screenshot) {
       imageUrl = await uploadImage(formData.screenshot);
@@ -77,7 +88,7 @@ rewardForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Upload image to ImgBB (optional)
+// Upload image to ImgBB
 async function uploadImage(file) {
   const formData = new FormData();
   formData.append("image", file);
@@ -102,11 +113,10 @@ function showStatus(message, type) {
   }, 5000);
 }
 
-// Initialize form (optional)
+// Initialize
 function init() {
-  console.log("Reward claim system ready");
-  // You can add more initialization code here
+  console.log("System ready");
+  // Additional initialization can go here
 }
 
-// Start the application
 init();
