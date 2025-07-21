@@ -1,63 +1,47 @@
-const imgbbAPIKey = "baacb15885823b0da52db6c791339cdc";
-const sheetScriptURL = "https://script.google.com/macros/s/AKfycbzNKkZIIPbanC7lu_9bzvkPZ3V2W3oyilfgU2HBMeWFV-gq8LbaPQIKEwDHkhmAbmAyrA/exec";
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("form");
 
-document.getElementById("downloadBtn").addEventListener("click", () => {
-  document.getElementById("formSection").style.display = "block";
-});
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-document.getElementById("rewardForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+    const name = form.name.value.trim();
+    const phone = form.phone.value.trim();
+    const upi = form.upi.value.trim();
+    const file = form.screenshot.files[0];
 
-  const name = this.name.value.trim();
-  const phone = this.phone.value.trim();
-  const upi = this.upi.value.trim();
-  const screenshotFile = this.screenshot.files[0];
+    if (!name || !phone.match(/^\d{10}$/) || !upi.includes("@") || !file) {
+      alert("Please fill all fields correctly and upload a valid screenshot.");
+      return;
+    }
 
-  if (!/^\d{10}$/.test(phone)) {
-    alert("❌ Phone number must be 10 digits.");
-    return;
-  }
+    const formData = new FormData();
+    formData.append("image", file);
 
-  if (!upi.includes("@")) {
-    alert("❌ UPI ID must contain @.");
-    return;
-  }
+    // Upload to ImgBB
+    try {
+      const imgbbRes = await fetch("https://api.imgbb.com/1/upload?key=baacb15885823b0da52db6c791339cdc", {
+        method: "POST",
+        body: formData,
+      });
 
-  if (!screenshotFile) {
-    alert("❌ Please upload a screenshot.");
-    return;
-  }
+      const imgbbData = await imgbbRes.json();
+      const imageUrl = imgbbData.data.url;
 
-  const formData = new FormData();
-  formData.append("image", screenshotFile);
+      // Send to Google Apps Script
+      const response = await fetch("https://script.google.com/macros/s/AKfycbzNKkZIIPbanC7lu_9bzvkPZ3V2W3oyilfgU2HBMeWFV-gq8LbaPQIKEwDHkhmAbmAyrA/exec", {
+        method: "POST",
+        body: JSON.stringify({ name, phone, upi, imageUrl }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  try {
-    const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbAPIKey}`, {
-      method: "POST",
-      body: formData
-    });
-    const imgbbData = await imgbbRes.json();
-    const imageUrl = imgbbData.data.url;
-
-    const body = {
-      name,
-      phone,
-      upi,
-      imageUrl
-    };
-
-    await fetch(sheetScriptURL, {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
-    alert("✅ Reward request submitted. You’ll be credited in 24 hours.");
-    this.reset();
-  } catch (error) {
-    alert("❌ Submission failed. Please try again later.");
-    console.error(error);
-  }
+      const result = await response.text();
+      alert("Reward request submitted. You’ll be credited in 24 hours.");
+      form.reset();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Submission failed. Please try again.");
+    }
+  });
 });
