@@ -1,6 +1,7 @@
 // Configuration
 const config = {
-  googleScriptURL: "https://script.google.com/macros/s/AKfycbz7zLJgNens8knNO1k5uP3xGhKHzkl00QdXyp7ywO3xD5DPjv2vnGkh92XDpbeME_U5pA/exec",
+ googleScriptURL: "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbw0ZDXbevS1nO-DTUIY-vsc8mZ3VWuVgmnYqvCw08Mf2k9LzpgM0bQ5jZuU2rs2BpVnJA/exec",
+
   imgbbAPIKey: "baacb15885823b0da52db6c791339cdc"
 };
 
