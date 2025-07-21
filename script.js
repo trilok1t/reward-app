@@ -2,7 +2,7 @@
 const config = {
   imgbbAPIKey: "baacb15885823b0da52db6c791339cdc",
   googleScriptURL: "https://script.google.com/macros/s/AKfycbyv613OR-wOfzyk_WAj7r3i6KzIPJZQUWYnmFtUoDfPyesNnUJt51QjmoXDqOZTuJo/exec",
-  secretKey: "your_secret_key_123"
+  secretKey: "W7n$Z4!pR9@2qF#5vT1*KxY6%8mL3"
 };
 
 // DOM Elements
