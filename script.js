@@ -107,3 +107,5 @@ function showStatus(message, type) {
     statusMessage.style.display = "none";
   }, 5000);
 }
+// Initialize
+console.log("Reward claim system initialized");
