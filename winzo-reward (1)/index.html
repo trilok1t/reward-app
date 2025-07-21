@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Winzo Reward Claim</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="App Logo" class="logo" />
+
+    <a href="https://google.com" target="_blank">
+      <button id="downloadBtn">Download App</button>
+    </a>
+
+    <div id="formSection" style="display: none;">
+      <form id="rewardForm">
+        <input type="text" name="name" placeholder="Enter your name" required />
+        <input type="tel" name="phone" placeholder="10-digit phone number" pattern="\d{10}" required />
+        <input type="text" name="upi" placeholder="Your UPI ID (e.g. xyz@upi)" pattern=".+@.+" required />
+        <input type="file" name="screenshot" accept="image/*" required />
+        <button type="submit">Submit</button>
+      </form>
+      <p class="note">Your reward will be credited within 24 hours after verification.</p>
+    </div>
+
+    <div class="instructions">
+      <h2>📌 Instructions:</h2>
+      <ul>
+        <li>1. Download the app using the button above.</li>
+        <li>2. Play any game and earn rewards.</li>
+        <li>3. Upload a screenshot of your reward claim.</li>
+        <li>4. Fill in your name, phone number, and UPI ID.</li>
+        <li>5. Submit the form to claim your ₹ reward.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
