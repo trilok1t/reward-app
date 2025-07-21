@@ -1,7 +1,6 @@
 // Configuration
 const config = {
- googleScriptURL: "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbw0ZDXbevS1nO-DTUIY-vsc8mZ3VWuVgmnYqvCw08Mf2k9LzpgM0bQ5jZuU2rs2BpVnJA/exec",
-
+  googleScriptURL: "https://script.google.com/macros/s/AKfycbynqNJbrI6TWYL99wjPIJwDVez5skDJtCeFR1nJ1aqbWfLsnaoemH67ylXfsnEE2Taqvw/exec",
   imgbbAPIKey: "baacb15885823b0da52db6c791339cdc"
 };
 
@@ -57,7 +56,16 @@ rewardForm.addEventListener("submit", async (e) => {
     // 1. Upload image if exists
     let imageUrl = "";
     if (formData.screenshot) {
-      imageUrl = await uploadImage(formData.screenshot);
+      const uploadForm = new FormData();
+      uploadForm.append("image", formData.screenshot);
+      
+      const imgbbResponse = await fetch(
+        `https://api.imgbb.com/1/upload?key=${config.imgbbAPIKey}`,
+        { method: "POST", body: uploadForm }
+      );
+      
+      const imgbbData = await imgbbResponse.json();
+      imageUrl = imgbbData.data?.url || "";
     }
 
     // 2. Send data to Google Sheets
@@ -89,20 +97,6 @@ rewardForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Upload image to ImgBB
-async function uploadImage(file) {
-  const formData = new FormData();
-  formData.append("image", file);
-
-  const response = await fetch(`https://api.imgbb.com/1/upload?key=${config.imgbbAPIKey}`, {
-    method: "POST",
-    body: formData
-  });
-
-  const data = await response.json();
-  return data.data?.url || "";
-}
-
 // Show status messages
 function showStatus(message, type) {
   statusMessage.textContent = message;
@@ -113,11 +107,3 @@ function showStatus(message, type) {
     statusMessage.style.display = "none";
   }, 5000);
 }
-
-// Initialize
-function init() {
-  console.log("System ready");
-  // Additional initialization can go here
-}
-
-init();
