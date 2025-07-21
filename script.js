@@ -107,5 +107,31 @@ function showStatus(message, type) {
     statusMessage.style.display = "none";
   }, 5000);
 }
+
+// Test connection function (run in browser console)
+window.testConnection = async () => {
+  try {
+    const testData = {
+      name: "Test User",
+      phone: "1234567890",
+      upi: "test@upi",
+      imageUrl: "https://example.com/test.jpg"
+    };
+    
+    const response = await fetch(config.googleScriptURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(testData)
+    });
+    
+    const result = await response.json();
+    console.log("Test connection result:", result);
+    return result;
+  } catch (error) {
+    console.error("Test connection failed:", error);
+    throw error;
+  }
+}
+
 // Initialize
-console.log("Reward claim system initialized");
+console.log("Reward claim system ready");
