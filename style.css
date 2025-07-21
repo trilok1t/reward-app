@@ -125,3 +125,11 @@ input:focus {
   color: white;
   display: block !important;
 }
+
+#initialSection {
+  transition: all 0.3s ease;
+}
+
+#formSection {
+  transition: all 0.3s ease;
+}
