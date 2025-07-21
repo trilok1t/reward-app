@@ -1,102 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Winzo Reward Claim</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="App Logo" class="logo" />
+    <img src="logo.png" alt="Winzo Logo" class="logo">
+    <h1>Claim Your Rewards</h1>
 
-    <button id="downloadBtn">Download App</button>
+    <div id="initialSection">
+      <p>Download the app and start playing to earn rewards!</p>
+      <button id="downloadBtn">Download App</button>
+    </div>
 
     <div id="formSection" style="display: none;">
       <form id="rewardForm">
-        <input type="text" name="name" placeholder="Enter your name" required />
-        <input type="tel" name="phone" placeholder="10-digit phone number" pattern="\d{10}" required />
-        <input type="text" name="upi" placeholder="Your UPI ID (e.g. xyz@upi)" pattern=".+@.+" required />
-        <input type="file" name="screenshot" accept="image/*" required />
-        <button type="submit">Submit</button>
+        <input type="text" name="name" placeholder="Your Full Name" required>
+        <input type="tel" name="phone" placeholder="10-digit Phone Number" pattern="\d{10}" required>
+        <input type="text" name="upi" placeholder="Your UPI ID (e.g. name@upi)" required>
+        <div class="file-upload">
+          <label for="screenshot">Upload Reward Screenshot:</label>
+          <input type="file" name="screenshot" id="screenshot" accept="image/*" required>
+        </div>
+        <button type="submit" id="submitBtn">Claim Reward</button>
       </form>
-      <p class="note">Your reward will be credited within 24 hours after verification.</p>
+      <div id="statusMessage"></div>
     </div>
 
     <div class="instructions">
-      <h2>📌 Instructions:</h2>
-      <ul>
-        <li>1. Click "Download App" to visit the app.</li>
-        <li>2. Play any game and earn rewards.</li>
-        <li>3. Take a screenshot showing your rewards.</li>
-        <li>4. Fill in your name, phone number, and UPI ID.</li>
-        <li>5. Submit the form to claim your ₹ reward.</li>
-      </ul>
+      <h2>📌 How to Claim:</h2>
+      <ol>
+        <li>Download the Winzo app using the button above</li>
+        <li>Play games and earn rewards</li>
+        <li>Take a screenshot of your reward</li>
+        <li>Fill in your details above</li>
+        <li>Submit to receive money via UPI within 24 hours</li>
+      </ol>
+      <div class="note">
+        <p>Note: Rewards are verified before processing. Invalid claims will be rejected.</p>
+      </div>
     </div>
   </div>
 
-  <script>
-    const downloadBtn = document.getElementById("downloadBtn");
-    const formSection = document.getElementById("formSection");
-    const rewardForm = document.getElementById("rewardForm");
-
-    downloadBtn.addEventListener("click", () => {
-      window.open("https://google.com", "_blank");
-      setTimeout(() => {
-        formSection.style.display = "block";
-      }, 300);
-    });
-
-    rewardForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const name = rewardForm.name.value;
-      const phone = rewardForm.phone.value;
-      const upi = rewardForm.upi.value;
-      const screenshot = rewardForm.screenshot.files[0];
-
-      if (!/^\d{10}$/.test(phone)) {
-        alert("Please enter a valid 10-digit phone number.");
-        return;
-      }
-
-      if (!upi.includes("@")) {
-        alert("Please enter a valid UPI ID.");
-        return;
-      }
-
-      if (!screenshot) {
-        alert("Please upload a screenshot.");
-        return;
-      }
-
-      const imgbbApiKey = "baacb15885823b0da52db6c791339cdc";
-      const formData = new FormData();
-      formData.append("image", screenshot);
-
-      try {
-        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
-          method: "POST",
-          body: formData
-        });
-        const imgbbData = await imgbbRes.json();
-        const imageUrl = imgbbData.data.url;
-
-        const sheetsRes = await fetch("https://script.google.com/macros/s/AKfycbzNKkZIIPbanC7lu_9bzvkPZ3V2W3oyilfgU2HBMeWFV-gq8LbaPQIKEwDHkhmAbmAyrA/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, phone, upi, screenshot: imageUrl })
-        });
-
-        await sheetsRes.text();
-        alert("✅ Reward request submitted. You’ll be credited in 24 hours!");
-        rewardForm.reset();
-
-      } catch (err) {
-        console.error(err);
-        alert("❌ Submission failed. Please try again later.");
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
