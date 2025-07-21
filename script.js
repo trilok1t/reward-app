@@ -1,125 +1,112 @@
 // Configuration
 const config = {
-  imgbbAPIKey: "baacb15885823b0da52db6c791339cdc",
-  googleScriptURL: "https://script.google.com/macros/s/AKfycbyv613OR-wOfzyk_WAj7r3i6KzIPJZQUWYnmFtUoDfPyesNnUJt51QjmoXDqOZTuJo/exec",
-  secretKey: "W7n$Z4!pR9@2qF#5vT1*KxY6%8mL3"
+  googleScriptURL: "https://script.google.com/macros/s/AKfycbz7zLJgNens8knNO1k5uP3xGhKHzkl00QdXyp7ywO3xD5DPjv2vnGkh92XDpbeME_U5pA/exec", // Replace with your deployed URL (ends with /exec)
+  imgbbAPIKey: "baacb15885823b0da52db6c791339cdc" // Optional - only if using image uploads
 };
 
 // DOM Elements
-const downloadBtn = document.getElementById("downloadBtn");
-const formSection = document.getElementById("formSection");
 const rewardForm = document.getElementById("rewardForm");
-const initialSection = document.getElementById("initialSection");
 const statusMessage = document.getElementById("statusMessage");
 
-// Event Listeners
-downloadBtn.addEventListener("click", () => {
-  initialSection.style.display = "none";
-  formSection.style.display = "block";
-});
-
-rewardForm.addEventListener("submit", async function(e) {
+// Form Submission Handler
+rewardForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   
-  // Get form values
-  const name = this.name.value.trim();
-  const phone = this.phone.value.trim();
-  const upi = this.upi.value.trim();
-  const screenshotFile = this.screenshot.files[0];
-  
+  // Get form data
+  const formData = {
+    name: e.target.name.value.trim(),
+    phone: e.target.phone.value.trim(),
+    upi: e.target.upi.value.trim(),
+    screenshot: e.target.screenshot.files[0]
+  };
+
   // Validate inputs
-  if (!/^[a-zA-Z ]+$/.test(name)) {
+  if (!formData.name || !/^[a-zA-Z ]+$/.test(formData.name)) {
     showStatus("Please enter a valid name", "error");
     return;
   }
-  
-  if (!/^\d{10}$/.test(phone)) {
+
+  if (!/^\d{10}$/.test(formData.phone)) {
     showStatus("Phone number must be 10 digits", "error");
     return;
   }
-  
-  if (!upi.includes("@") || upi.length < 5) {
+
+  if (!formData.upi.includes("@")) {
     showStatus("Please enter a valid UPI ID", "error");
     return;
   }
-  
-  if (!screenshotFile) {
-    showStatus("Please upload a screenshot", "error");
-    return;
-  }
-  
+
   // Disable submit button during processing
-  const submitBtn = document.getElementById("submitBtn");
+  const submitBtn = e.target.querySelector("button[type=submit]");
   submitBtn.disabled = true;
   submitBtn.textContent = "Processing...";
-  
+
   try {
-    // Step 1: Upload image to ImgBB
-    const imageUrl = await uploadImage(screenshotFile);
-    
-    // Step 2: Send data to Google Sheets
-    const response = await sendToGoogleSheets(name, phone, upi, imageUrl);
-    
-    if (response.success) {
-      showStatus("✅ Reward claim submitted! You'll receive payment within 24 hours.", "success");
+    // 1. Upload image if exists (optional)
+    let imageUrl = "";
+    if (formData.screenshot) {
+      imageUrl = await uploadImage(formData.screenshot);
+    }
+
+    // 2. Send data to Google Sheets
+    const response = await fetch(config.googleScriptURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: formData.name,
+        phone: formData.phone,
+        upi: formData.upi,
+        imageUrl: imageUrl || "No screenshot"
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showStatus("✅ Reward claimed successfully! Payment will arrive within 24 hours.", "success");
       rewardForm.reset();
     } else {
-      throw new Error(response.error || "Submission failed");
+      throw new Error(result.error || "Submission failed");
     }
   } catch (error) {
-    console.error("Error:", error);
     showStatus(`❌ Error: ${error.message}`, "error");
+    console.error("Submission error:", error);
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Claim Reward";
   }
 });
 
-// Helper Functions
+// Upload image to ImgBB (optional)
 async function uploadImage(file) {
   const formData = new FormData();
   formData.append("image", file);
-  
+
   const response = await fetch(`https://api.imgbb.com/1/upload?key=${config.imgbbAPIKey}`, {
     method: "POST",
     body: formData
   });
-  
+
   const data = await response.json();
-  
-  if (!data.success) {
-    throw new Error("Image upload failed");
-  }
-  
-  return data.data.url;
+  return data.data?.url || "";
 }
 
-async function sendToGoogleSheets(name, phone, upi, imageUrl) {
-  const payload = {
-    name,
-    phone,
-    upi,
-    imageUrl,
-    secret: config.secretKey
-  };
-  
-  const response = await fetch(config.googleScriptURL, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-  
-  return await response.json();
-}
-
+// Show status messages
 function showStatus(message, type) {
   statusMessage.textContent = message;
   statusMessage.className = type;
   statusMessage.style.display = "block";
-  
+
   setTimeout(() => {
     statusMessage.style.display = "none";
   }, 5000);
 }
+
+// Initialize form (optional)
+function init() {
+  console.log("Reward claim system ready");
+  // You can add more initialization code here
+}
+
+// Start the application
+init();
