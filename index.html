@@ -1,50 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Winzo Reward Claim</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="Winzo Logo" class="logo">
+    <img src="logo.png" class="logo">
     <h1>Claim Your Rewards</h1>
-
+    
     <div id="initialSection">
-      <p>Download the app and start playing to earn rewards!</p>
       <button id="downloadBtn">Download App</button>
     </div>
-
-    <div id="formSection" style="display: none;">
+    
+    <div id="formSection" style="display:none">
       <form id="rewardForm">
-        <input type="text" name="name" placeholder="Your Full Name" required>
-        <input type="tel" name="phone" placeholder="10-digit Phone Number" pattern="\d{10}" required>
-        <input type="text" name="upi" placeholder="Your UPI ID (e.g. name@upi)" required>
-        <div class="file-upload">
-          <label for="screenshot">Upload Reward Screenshot:</label>
-          <input type="file" name="screenshot" id="screenshot" accept="image/*">
-        </div>
-        <button type="submit" id="submitBtn">Claim Reward</button>
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="tel" name="phone" placeholder="Phone Number" required>
+        <input type="text" name="upi" placeholder="UPI ID" required>
+        <input type="file" name="screenshot" accept="image/*">
+        <button type="submit">Claim Reward</button>
       </form>
       <div id="statusMessage"></div>
     </div>
-
+    
     <div class="instructions">
-      <h2>📌 How to Claim:</h2>
+      <h3>How to Claim:</h3>
       <ol>
-        <li>Download the Winzo app using the button above</li>
-        <li>Play games and earn rewards</li>
-        <li>Take a screenshot of your reward</li>
-        <li>Fill in your details above</li>
-        <li>Submit to receive money via UPI within 24 hours</li>
+        <li>Download the app</li>
+        <li>Play games</li>
+        <li>Submit rewards</li>
       </ol>
-      <div class="note">
-        <p>Note: Rewards are verified before processing. Invalid claims will be rejected.</p>
-      </div>
     </div>
   </div>
-
+  
   <script src="script.js"></script>
 </body>
 </html>
