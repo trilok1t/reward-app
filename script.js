@@ -1,47 +1,125 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector("form");
+// Configuration
+const config = {
+  imgbbAPIKey: "baacb15885823b0da52db6c791339cdc",
+  googleScriptURL: "YOUR_GOOGLE_SCRIPT_URL_HERE",
+  secretKey: "your_secret_key_123"
+};
 
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+// DOM Elements
+const downloadBtn = document.getElementById("downloadBtn");
+const formSection = document.getElementById("formSection");
+const rewardForm = document.getElementById("rewardForm");
+const initialSection = document.getElementById("initialSection");
+const statusMessage = document.getElementById("statusMessage");
 
-    const name = form.name.value.trim();
-    const phone = form.phone.value.trim();
-    const upi = form.upi.value.trim();
-    const file = form.screenshot.files[0];
+// Event Listeners
+downloadBtn.addEventListener("click", () => {
+  initialSection.style.display = "none";
+  formSection.style.display = "block";
+});
 
-    if (!name || !phone.match(/^\d{10}$/) || !upi.includes("@") || !file) {
-      alert("Please fill all fields correctly and upload a valid screenshot.");
-      return;
+rewardForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  
+  // Get form values
+  const name = this.name.value.trim();
+  const phone = this.phone.value.trim();
+  const upi = this.upi.value.trim();
+  const screenshotFile = this.screenshot.files[0];
+  
+  // Validate inputs
+  if (!/^[a-zA-Z ]+$/.test(name)) {
+    showStatus("Please enter a valid name", "error");
+    return;
+  }
+  
+  if (!/^\d{10}$/.test(phone)) {
+    showStatus("Phone number must be 10 digits", "error");
+    return;
+  }
+  
+  if (!upi.includes("@") || upi.length < 5) {
+    showStatus("Please enter a valid UPI ID", "error");
+    return;
+  }
+  
+  if (!screenshotFile) {
+    showStatus("Please upload a screenshot", "error");
+    return;
+  }
+  
+  // Disable submit button during processing
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Processing...";
+  
+  try {
+    // Step 1: Upload image to ImgBB
+    const imageUrl = await uploadImage(screenshotFile);
+    
+    // Step 2: Send data to Google Sheets
+    const response = await sendToGoogleSheets(name, phone, upi, imageUrl);
+    
+    if (response.success) {
+      showStatus("✅ Reward claim submitted! You'll receive payment within 24 hours.", "success");
+      rewardForm.reset();
+    } else {
+      throw new Error(response.error || "Submission failed");
     }
+  } catch (error) {
+    console.error("Error:", error);
+    showStatus(`❌ Error: ${error.message}`, "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Claim Reward";
+  }
+});
 
-    const formData = new FormData();
-    formData.append("image", file);
+// Helper Functions
+async function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+  
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${config.imgbbAPIKey}`, {
+    method: "POST",
+    body: formData
+  });
+  
+  const data = await response.json();
+  
+  if (!data.success) {
+    throw new Error("Image upload failed");
+  }
+  
+  return data.data.url;
+}
 
-    // Upload to ImgBB
-    try {
-      const imgbbRes = await fetch("https://api.imgbb.com/1/upload?key=baacb15885823b0da52db6c791339cdc", {
-        method: "POST",
-        body: formData,
-      });
-
-      const imgbbData = await imgbbRes.json();
-      const imageUrl = imgbbData.data.url;
-
-      // Send to Google Apps Script
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzNKkZIIPbanC7lu_9bzvkPZ3V2W3oyilfgU2HBMeWFV-gq8LbaPQIKEwDHkhmAbmAyrA/exec", {
-        method: "POST",
-        body: JSON.stringify({ name, phone, upi, imageUrl }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.text();
-      alert("Reward request submitted. You’ll be credited in 24 hours.");
-      form.reset();
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Submission failed. Please try again.");
+async function sendToGoogleSheets(name, phone, upi, imageUrl) {
+  const payload = {
+    name,
+    phone,
+    upi,
+    imageUrl,
+    secret: config.secretKey
+  };
+  
+  const response = await fetch(config.googleScriptURL, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json"
     }
   });
-});
+  
+  return await response.json();
+}
+
+function showStatus(message, type) {
+  statusMessage.textContent = message;
+  statusMessage.className = type;
+  statusMessage.style.display = "block";
+  
+  setTimeout(() => {
+    statusMessage.style.display = "none";
+  }, 5000);
+}
